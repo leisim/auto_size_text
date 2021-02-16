@@ -32,7 +32,10 @@ class AutoSizeText extends StatefulWidget {
     this.textScaleFactor,
     this.maxLines,
     this.semanticsLabel,
-  })  : textSpan = null,
+    this.onOverflow
+  }) : assert(data != null,
+            'A non-null String must be provided to a AutoSizeText widget.'),
+        textSpan = null,
         super(key: key);
 
   /// Creates a [AutoSizeText] widget with a [TextSpan].
@@ -57,7 +60,10 @@ class AutoSizeText extends StatefulWidget {
     this.textScaleFactor,
     this.maxLines,
     this.semanticsLabel,
-  })  : data = null,
+    this.onOverflow
+  }) : assert(textSpan != null,
+            'A non-null TextSpan must be provided to a AutoSizeText.rich widget.'),
+        data = null,
         super(key: key);
 
   /// Sets the key for the resulting [Text] widget.
@@ -215,6 +221,9 @@ class AutoSizeText extends StatefulWidget {
   /// ```
   final String? semanticsLabel;
 
+  /// A callback that notifies when the content overflowed
+  final Function onOverflow;
+
   @override
   _AutoSizeTextState createState() => _AutoSizeTextState();
 }
@@ -265,6 +274,10 @@ class _AutoSizeTextState extends State<AutoSizeText> {
         text = _buildText(widget.group!._fontSize, style, maxLines);
       } else {
         text = _buildText(fontSize, style, maxLines);
+      }
+
+      if (!textFits) {
+        widget.onOverflow.call();
       }
 
       if (widget.overflowReplacement != null && !textFits) {
